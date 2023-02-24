@@ -1,0 +1,654 @@
+---
+title: "Untitled"
+author: "2636913y"
+date: '2022-07-02'
+output: html_document
+---
+
+1) Search tweets
+```{r}
+library(tidyverse)
+library(rtweet)
+
+library(tm)
+library(lubridate)
+library(dplyr)
+library(plotly)
+library(scales)
+
+library(RSentiment)
+library(stringr)
+library(broom)
+library(tidyr)
+library(tidytext)
+
+## Search tweets with hashtags
+trytweets <- search_tweets(q = "#CatherineLido", n = 50, type="recent", lang="en", token=twitter_token)
+
+##Search tweets with account name
+CL_tweet <- get_timelines(c("CatherineLido"), n = 2000)
+
+### 0703 UofG 2 males 2 females school of engineering
+#Add the list of profs
+x <- c("ProfAdhikari", "WasimJawa", "ShujaSAnsari", "AndreaC_82", "marcocantini24", "mtcerio", "AWClarkResearch", "uno_lab", "joncoopervp", "RavinderSDahiya", "KDelfanazari", "Andrew_Feeney", "vihardabest", "georgiougeor", "rmghannam", "stugrey", "QuantumSensors", "hadihei", "DCHutchings", "LukaszKaczmarcz", "Energy_Yiji", "RairMacedo", "kayode_onireti", "SemiconUofG", "cjpearce", "KiranKumar_R", "ManuelMime", "saxenaprshnt", "AhmadTaha91", "ManlioTassieri", "Masood_Nizami", "Hydro_Mechanic", "MartinWeides", "KjWorrall", "YazdaniAsrami", "SimingYou", "HZBehtash", "Lei_Zhang_Gla", "zhaodezong", "GuodongZhao4", "AhmedZoha")
+y <- "" #not sure whether needed
+
+# make a for loop to read through all account names
+for(val in x){
+  prof <- get_timelines(c(x), n = 2000)
+  y <- rbind(prof)
+}
+
+# male engineer twitter account
+ProfAdhikari <- get_timelines(c("ProfAdhikari"), n = 2000)
+WasimJawa <- get_timelines(c("WasimJawa"), n = 2000)
+ShujaSAnsari <- get_timelines(c("ShujaSAnsari"), n = 2000) 
+AndreaC_82 <- get_timelines(c("AndreaC_82"), n = 2000) 
+marcocantini24 <- get_timelines(c("marcocantini24"), n = 2000) 
+mtcerio <- get_timelines(c("mtcerio"), n = 2000) 
+AWClarkResearch <- get_timelines(c("AWClarkResearch"), n = 2000) 
+uno_lab <- get_timelines(c("uno_lab"), n = 2000) 
+joncoopervp <- get_timelines(c("joncoopervp"), n = 2000) 
+RavinderSDahiya <- get_timelines(c("RavinderSDahiya"), n = 2000) 
+KDelfanazari <- get_timelines(c("KDelfanazari"), n = 2000) 
+Andrew_Feeney <- get_timelines(c("Andrew_Feeney"), n = 2000) 
+vihardabest <- get_timelines(c("vihardabest"), n = 2000) 
+georgiougeor <- get_timelines(c("georgiougeor"), n = 2000) 
+rmghannam <- get_timelines(c("rmghannam"), n = 2000) 
+stugrey <- get_timelines(c("stugrey"), n = 2000) 
+QuantumSensors <- get_timelines(c("QuantumSensors"), n = 2000) 
+hadihei <- get_timelines(c("hadihei"), n = 2000)
+DCHutchings <- get_timelines(c("DCHutchings"), n = 2000)
+LukaszKaczmarcz <- get_timelines(c("LukaszKaczmarcz"), n = 2000)
+Energy_Yiji <- get_timelines(c("Energy_Yiji"), n = 2000)
+RairMacedo <- get_timelines(c("RairMacedo"), n = 2000)
+kayode_onireti <- get_timelines(c("kayode_onireti"), n = 2000)
+SemiconUofG <- get_timelines(c("SemiconUofG"), n = 2000)
+cjpearce <- get_timelines(c("cjpearce"), n = 2000)
+KiranKumar_R <- get_timelines(c("KiranKumar_R"), n = 2000)
+ManuelMime <- get_timelines(c("ManuelMime"), n = 2000)
+saxenaprshnt <- get_timelines(c("saxenaprshnt"), n = 2000)
+AhmadTaha91 <- get_timelines(c("AhmadTaha91"), n = 2000)
+ManlioTassieri <- get_timelines(c("ManlioTassieri"), n = 2000)
+Masood_Nizami <- get_timelines(c("Masood_Nizami"), n = 2000)
+Hydro_Mechanic <- get_timelines(c("Hydro_Mechanic"), n = 2000)
+MartinWeides <- get_timelines(c("MartinWeides"), n = 2000)
+KjWorrall <- get_timelines(c("KjWorrall"), n = 2000)
+YazdaniAsrami <- get_timelines(c("YazdaniAsrami"), n = 2000)
+SimingYou <- get_timelines(c("SimingYou"), n = 2000)
+HZBehtash <- get_timelines(c("HZBehtash"), n = 2000)
+Lei_Zhang_Gla <- get_timelines(c("Lei_Zhang_Gla"), n = 2000)
+zhaodezong <- get_timelines(c("zhaodezong"), n = 2000)
+GuodongZhao4 <- get_timelines(c("GuodongZhao4"), n = 2000)
+AhmedZoha <- get_timelines(c("AhmedZoha"), n = 2000)
+
+
+male_eng_tw <- rbind(ProfAdhikari, WasimJawa, ShujaSAnsari, AndreaC_82, marcocantini24, mtcerio, AWClarkResearch, uno_lab, joncoopervp, RavinderSDahiya, KDelfanazari, Andrew_Feeney, vihardabest, georgiougeor, rmghannam, stugrey, QuantumSensors, hadihei, DCHutchings, LukaszKaczmarcz, Energy_Yiji, RairMacedo, kayode_onireti, SemiconUofG, cjpearce, KiranKumar_R, ManuelMime, saxenaprshnt, AhmadTaha91, ManlioTassieri, Masood_Nizami, Hydro_Mechanic, MartinWeides, KjWorrall, YazdaniAsrami, SimingYou, HZBehtash, Lei_Zhang_Gla, zhaodezong, GuodongZhao4, AhmedZoha)
+
+#female engineer twitter account
+
+anaerocity <- get_timelines(c("anaerocity"), n = 2000)
+cgl_119 <- get_timelines(c("cgl_119"), n = 2000)
+CJSmith_Galway <- get_timelines(c("CJSmith_Galway"), n = 2000)
+WenjuanSong <- get_timelines(c("WenjuanSong"), n = 2000)
+
+female_eng_tw <- rbind(anaerocity, cgl_119, CJSmith_Galway, WenjuanSong, aranceta, inaahon, A_Kostrytsia, AulaAmmar1, cmerrickbio, ciara_mcgrathx, Kate_McAulay, KimiaWitte, martavig5, bandiera_lucia, CamillaEnergy, RosalindHeron, XiKing2, DrZQiu)
+
+
+#Psychology male twitter account
+mickcraig101  <- get_timelines(c("mickcraig101"), n = 2000)
+mm_kohl <- get_timelines(c("mm_kohl"), n = 2000)
+McAleerP <- get_timelines(c("McAleerP"), n = 2000)
+LarsMuckli <- get_timelines(c("LarsMuckli"), n = 2000)
+jamiegmurray86 <- get_timelines(c("jamiegmurray86"), n = 2000)
+robustgar <- get_timelines(c("robustgar"), n = 2000)
+DrDavidRSimmons <- get_timelines(c("DrDavidRSimmons"), n = 2000)
+rockNroll87q <- get_timelines(c("rockNroll87q"), n = 2000)
+GregorThut <- get_timelines(c("GregorThut"), n = 2000)
+PUhlhaas <- get_timelines(c("PUhlhaas"), n = 2000)
+dalejbarr <- get_timelines(c("dalejbarr"), n = 2000)
+JamesEBartlett <- get_timelines(c("JamesEBartlett"), n = 2000)
+realdaubman <- get_timelines(c("realdaubman"), n = 2000)
+EugeneDawydiak <- get_timelines(c("EugeneDawydiak"), n = 2000)
+
+male_psy_tw <- rbind(mickcraig101, mm_kohl, McAleerP, LarsMuckli, jamiegmurray86, robustgar, DrDavidRSimmons, rockNroll87q, GregorThut, PUhlhaas, dalejbarr, JamesEBartlett, realdaubman, EugeneDawydiak)
+
+#Psychology female twitter account
+emilynordmann <- get_timelines(c("emilynordmann"), n = 2000)
+Limor_Raviv <- get_timelines(c("Limor_Raviv"), n = 2000)
+KateReidGlasgow <- get_timelines(c("KateReidGlasgow"), n = 2000)
+a_e_robertson <- get_timelines(c("a_e_robertson"), n = 2000)
+CSampaioBaptist <- get_timelines(c("CSampaioBaptist"), n = 2000)
+hollyscott248 <- get_timelines(c("hollyscott248"), n = 2000)
+william_the_sir <- get_timelines(c("william_the_sir"), n = 2000)
+maxine_swingler <- get_timelines(c("maxine_swingler"), n = 2000)
+MarWimber <- get_timelines(c("MarWimber"), n = 2000)
+k_ainsworth_ <- get_timelines(c("k_ainsworth_"), n = 2000)
+StephanyBiello <- get_timelines(c("StephanyBiello"), n = 2000)
+clelandwoods <- get_timelines(c("clelandwoods"), n = 2000)
+brain_on_dance <- get_timelines(c("brain_on_dance"), n = 2000)
+LisaDeBruine <- get_timelines(c("LisaDeBruine"), n = 2000)
+Zayba_G <- get_timelines(c("Zayba_G"), n = 2000)
+aussieweegie <- get_timelines(c("aussieweegie"), n = 2000)
+rachaelejack <- get_timelines(c("rachaelejack"), n = 2000)
+pimpmymemory <- get_timelines(c("pimpmymemory"), n = 2000)
+
+female_psy_tw <- rbind(emilynordmann, Limor_Raviv, KateReidGlasgow, a_e_robertson, CSampaioBaptist, hollyscott248, william_the_sir, maxine_swingler, MarWimber, k_ainsworth_, StephanyBiello, clelandwoods, brain_on_dance, LisaDeBruine, Zayba_G, aussieweegie, rachaelejack, pimpmymemory)
+
+#Visnet project (female eng)
+aranceta <- get_timelines(c("aranceta"), n = 2000)
+inaahon <- get_timelines(c("inaahon"), n = 2000)
+A_Kostrytsia <- get_timelines(c("A_Kostrytsia"), n = 2000)
+AulaAmmar1 <- get_timelines(c("AulaAmmar1"), n = 2000)
+cmerrickbio <- get_timelines(c("cmerrickbio"), n = 2000)
+ciara_mcgrathx <- get_timelines(c("ciara_mcgrathx"), n = 2000)
+Kate_McAulay <- get_timelines(c("Kate_McAulay"), n = 2000)
+KimiaWitte <- get_timelines(c("KimiaWitte"), n = 2000)
+martavig5 <- get_timelines(c("martavig5"), n = 2000)
+bandiera_lucia <- get_timelines(c("bandiera_lucia"), n = 2000)
+CamillaEnergy <- get_timelines(c("CamillaEnergy"), n = 2000)
+RosalindHeron <- get_timelines(c("RosalindHeron"), n = 2000)
+XiKing2 <- get_timelines(c("XiKing2"), n = 2000)
+DrZQiu <- get_timelines(c("DrZQiu"), n = 2000)
+
+```
+
+2) text cleaning and find frequencies and sentiment analysis
+```{r}
+library(ggplot2)
+library(tm)
+library(readr)
+library(wordcloud)
+library(plyr)
+library(lubridate)
+
+require(SnowballC)
+
+#Extract text and data cleaning
+text <- as.character(female_eng_tw$text)##put the document and the column you want here
+sample <- sample(text, length(text))
+corpus <- Corpus(VectorSource(list(sample)))
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus,content_transformer(tolower))
+corpus <- tm_map(corpus,removeNumbers)
+corpus <- tm_map(corpus, stripWhitespace)
+corpus <- tm_map(corpus,removeWords, stopwords("english"))
+corpus <- tm_map(corpus,removeWords, stopwords("french"))
+dtm_up <- DocumentTermMatrix(VCorpus(VectorSource(corpus[[1]]$content)))
+
+##frequencies and sentiment analysis
+freq_up = colSums(as.matrix(dtm_up))
+
+require(RSentiment)
+
+sentiments_up <- calculate_sentiment(names(freq_up))
+sentiments_up <- cbind(sentiments_up, as.data.frame(freq_up))
+
+frequencies = DocumentTermMatrix(corpus)
+findFreqTerms(frequencies, lowfreq=20)
+
+## eng males/ females tweets sentiments (do not run these codes!)
+sentiments_e_m_tw <- sentiments_up
+dtm_up_e_m_tw <- dtm_up
+sentiments_e_f_tw <- sentiments_up
+dtm_up_e_f_tw <- dtm_up
+sentiments_p_m_tw <- sentiments_up
+dtm_up_p_m_tw <- dtm_up
+sentiments_p_f_tw <- sentiments_up
+dtm_up_p_f_tw <- dtm_up
+```
+
+3) Topic modeling
+```{r}
+#male engineer twitter
+library(topicmodels)
+library(tm)
+library(stm)
+ap_lda_e_m_tw_4 <- LDA(dtm_up_e_m_tw, k=4, control=list(seed=1234))
+
+library(tidytext)
+ap_topics_eng_male_tw_4 <- tidy(ap_lda_e_m_tw_4, matrix = "beta")
+
+
+library(ggplot2)
+library(dplyr)
+
+ap_top_terms_eng_male_tw_4 <- ap_topics_eng_male_tw_4%>%
+  group_by(topic)%>%
+  top_n(10, beta)%>%
+  ungroup()%>%
+  arrange(topic, -beta)
+
+graph_eng_male_tw_4 <- ap_top_terms_eng_male_tw_4 %>%
+  mutate(term = reorder(term, beta)) %>%
+  ggplot(aes(term, beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  coord_flip()
+print(graph_eng_male_tw_4)
+
+##female engineer tweets
+ap_lda_e_f_tw_4 <- LDA(dtm_up_e_f_tw, k=4, control=list(seed=1234))
+
+library(tidytext)
+ap_topics_eng_f_tw_4 <- tidy(ap_lda_e_f_tw_4, matrix = "beta")
+
+
+library(ggplot2)
+library(dplyr)
+
+ap_top_terms_eng_f_tw_4 <- ap_topics_eng_f_tw_4%>%
+  group_by(topic)%>%
+  top_n(9, beta)%>%
+  ungroup()%>%
+  arrange(topic, -beta)
+
+graph_eng_f_tw_4 <- ap_top_terms_eng_f_tw_4 %>%
+  mutate(term = reorder(term, beta)) %>%
+  ggplot(aes(term, beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  coord_flip()
+print(graph_eng_f_tw_4)
+
+#male psy twitter
+ap_lda_p_m_tw <- LDA(dtm_up_p_m_tw, k=4, control=list(seed=1234))
+
+library(tidytext)
+ap_topics_p_m_tw <- tidy(ap_lda_p_m_tw, matrix = "beta")
+
+
+library(ggplot2)
+library(dplyr)
+
+ap_top_terms_p_m_tw <- ap_topics_p_m_tw%>%
+  group_by(topic)%>%
+  top_n(10, beta)%>%
+  ungroup()%>%
+  arrange(topic, -beta)
+
+graph_p_m_tw <- ap_top_terms_p_m_tw %>%
+  mutate(term = reorder(term, beta)) %>%
+  ggplot(aes(term, beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  coord_flip()
+print(graph_p_m_tw)
+
+#female psy twitter
+ap_lda_p_f_tw <- LDA(dtm_up_p_f_tw, k=4, control=list(seed=1234))
+
+library(tidytext)
+ap_topics_p_f_tw <- tidy(ap_lda_p_f_tw, matrix = "beta")
+
+
+library(ggplot2)
+library(dplyr)
+
+ap_top_terms_p_f_tw <- ap_topics_p_f_tw%>%
+  group_by(topic)%>%
+  top_n(9, beta)%>%
+  ungroup()%>%
+  arrange(topic, -beta)
+
+graph_p_f_tw <- ap_top_terms_p_f_tw %>%
+  mutate(term = reorder(term, beta)) %>%
+  ggplot(aes(term, beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  coord_flip()
+print(graph_p_f_tw)
+
+```
+
+2) text cleaning and find frequencies and sentiment analysis (biography)
+```{r}
+library(ggplot2)
+library(tm)
+library(readr)
+library(wordcloud)
+library(plyr)
+library(lubridate)
+
+require(SnowballC)
+
+##Read csv
+#male eng cvs
+library(tidyverse)
+male <- file.choose("male_eng")
+male_eng <- read.csv(male)
+View(male_eng)
+#female eng csv
+female <- file.choose("female_eng")
+female_eng <- read.csv(female)
+#male psy csv
+male <- file.choose("male_psy")
+male_psy <- read.csv(male)
+#female psy csv
+female <- file.choose("female_psy")
+female_psy <- read.csv(female)
+
+
+##Extract text and data cleaning
+text <- as.character(female_eng$text)##put the document and the column you want here
+sample <- sample(text, length(text))
+corpus <- Corpus(VectorSource(list(sample)))
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus,content_transformer(tolower))
+corpus <- tm_map(corpus,removeNumbers)
+corpus <- tm_map(corpus, stripWhitespace)
+corpus <- tm_map(corpus,removeWords, stopwords("english"))
+dtm_up <- DocumentTermMatrix(VCorpus(VectorSource(corpus[[1]]$content)))
+
+##frequencies and sentiment analysis
+freq_up = colSums(as.matrix(dtm_up))
+
+require(RSentiment)
+
+sentiments_up <- calculate_sentiment(names(freq_up))
+sentiments_up <- cbind(sentiments_up, as.data.frame(freq_up))
+
+frequencies = DocumentTermMatrix(corpus)
+findFreqTerms(frequencies, lowfreq=20)
+
+## Biography dtm_up, sentiment_up (do not run these codes!)
+sentiments_up_e_m_bio <- sentiments_up
+dtm_up_e_m_bio <- dtm_up
+sentiments_up_e_f_bio <- sentiments_up
+dtm_up_e_f_bio <- dtm_up
+sentiments_up_p_m_bio <- sentiments_up
+dtm_up_p_m_bio <- dtm_up
+sentiments_up_p_f_bio <- sentiments_up
+dtm_up_p_f_bio <- dtm_up
+```
+
+3) Topic modeling
+```{r}
+###engineer male biography
+library(topicmodels)
+library(tm)
+library(stm)
+ap_lda_e_m_bio <- LDA(dtm_up_e_m_bio, k=4, control=list(seed=1234))
+
+library(tidytext)
+ap_topics_e_m_bio <- tidy(ap_lda_e_m_bio, matrix = "beta")
+
+
+library(ggplot2)
+library(dplyr)
+
+ap_top_terms_e_m_bio <- ap_topics_e_m_bio%>%
+  group_by(topic)%>%
+  top_n(10, beta)%>%
+  ungroup()%>%
+  arrange(topic, -beta)
+
+graph_e_m_bio <- ap_top_terms_e_m_bio %>%
+  mutate(term = reorder(term, beta)) %>%
+  ggplot(aes(term, beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  coord_flip()
+print(graph_e_m_bio)
+
+##engineer female biography
+library(topicmodels)
+library(tm)
+library(stm)
+ap_lda_e_f_bio <- LDA(dtm_up_e_f_bio, k=4, control=list(seed=1234))
+
+library(tidytext)
+ap_topics_e_f_bio <- tidy(ap_lda_e_f_bio, matrix = "beta")
+
+
+library(ggplot2)
+library(dplyr)
+
+ap_top_terms_e_f_bio <- ap_topics_e_f_bio%>%
+  group_by(topic)%>%
+  top_n(10, beta)%>%
+  ungroup()%>%
+  arrange(topic, -beta)
+
+graph_e_f_bio <- ap_top_terms_e_f_bio %>%
+  mutate(term = reorder(term, beta)) %>%
+  ggplot(aes(term, beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  coord_flip()
+print(graph_e_f_bio)
+
+#psychology male biography
+library(topicmodels)
+library(tm)
+library(stm)
+ap_lda_p_m_bio <- LDA(dtm_up_p_m_bio, k=4, control=list(seed=1234))
+
+library(tidytext)
+ap_topics_p_m_bio <- tidy(ap_lda_p_m_bio, matrix = "beta")
+
+
+library(ggplot2)
+library(dplyr)
+
+ap_top_terms_p_m_bio <- ap_topics_p_m_bio%>%
+  group_by(topic)%>%
+  top_n(10, beta)%>%
+  ungroup()%>%
+  arrange(topic, -beta)
+
+graph_p_m_bio <- ap_top_terms_p_m_bio %>%
+  mutate(term = reorder(term, beta)) %>%
+  ggplot(aes(term, beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  coord_flip()
+print(graph_p_m_bio)
+
+#psychology female biography
+library(topicmodels)
+library(tm)
+library(stm)
+ap_lda_p_f_bio <- LDA(dtm_up_p_f_bio, k=4, control=list(seed=1234))
+
+library(tidytext)
+ap_topics_p_f_bio <- tidy(ap_lda_p_f_bio, matrix = "beta")
+
+
+library(ggplot2)
+library(dplyr)
+
+ap_top_terms_p_f_bio <- ap_topics_p_f_bio%>%
+  group_by(topic)%>%
+  top_n(10, beta)%>%
+  ungroup()%>%
+  arrange(topic, -beta)
+
+graph_p_f_bio <- ap_top_terms_p_f_bio %>%
+  mutate(term = reorder(term, beta)) %>%
+  ggplot(aes(term, beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  coord_flip()
+print(graph_p_f_bio)
+```
+
+```{r}
+library(rtweet)        # Used for extracting the tweets
+library(tm) # Text mining cleaning
+library(stringr)       # Removing characters
+library(qdapRegex)     # Removing URLs 
+library(wordcloud2)    # Creating the wordcloud
+
+all_psy <- rbind(male_psy, female_psy)
+
+text <- str_c(all_psy$text, collapse = "")
+text <- 
+  text %>%
+  str_remove("\\n") %>%                   # remove linebreaks
+  rm_twitter_url() %>%                    # Remove URLS
+  rm_url() %>%
+  str_remove_all("#\\S+") %>%             # Remove any hashtags
+  str_remove_all("@\\S+") %>%             # Remove any @ mentions
+  removeWords(stopwords("english")) %>%   # Remove common words (a, the, it etc.)
+  removeNumbers() %>%
+  stripWhitespace() %>%
+  removeWords(c("amp"))                   # Final cleanup of other small changes
+
+textCorpus <- 
+  Corpus(VectorSource(text)) %>%
+  TermDocumentMatrix() %>%
+  as.matrix()
+
+textCorpus <- sort(rowSums(textCorpus), decreasing=TRUE)
+textCorpus <- data.frame(word = names(textCorpus),freq=textCorpus)
+head(textCorpus, 10)
+
+# build wordcloud 
+set.seed(1234)
+wordcloud(words = textCorpus$word, freq = textCorpus$freq, min.freq = 1,
+          max.words=50, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+
+
+```
+
+T-test
+
+```{r}
+library(dplyr)
+## agentic and communal attributes
+ttest_e_m_a <- sentiments_e_m_tw %>% filter(text %in% c("achievement", "active", "ambitious", "analytical", "asserrtive", "bold", "competent", "competitive", "consistent", "decisive", "responsibility", "direct", "dominant", "effective", "firm", "forceful", "independent", "intelligent", "leadership", "logical", "objective", "organized", "persistent", "productive", "relaxed", "reliable", "risk", "confident", "control", "sophisticated", "steady", "strong", "task", "vigorous" ))
+
+ttest_e_m_c <- sentiments_e_m_tw %>% filter(text %in% c("aware", "cheerful", "collaborative", "communicative", "compassionate", "emotional", "generous", "gentle", "helpful", "value", "intuitive", "kind", "modest", "neat", "people", "relationship", "sensitive", "sentimental", "sincere", "sociable", "sympathetic", "tender", "understanding", "warm" ))
+
+mickcraig101  <- get_timelines(c("mickcraig101"), n = 2000)
+mm_kohl <- get_timelines(c("mm_kohl"), n = 2000)
+McAleerP <- get_timelines(c("McAleerP"), n = 2000)
+LarsMuckli <- get_timelines(c("LarsMuckli"), n = 2000)
+jamiegmurray86 <- get_timelines(c("jamiegmurray86"), n = 2000)
+robustgar <- get_timelines(c("robustgar"), n = 2000)
+DrDavidRSimmons <- get_timelines(c("DrDavidRSimmons"), n = 2000)
+rockNroll87q <- get_timelines(c("rockNroll87q"), n = 2000)
+GregorThut <- get_timelines(c("GregorThut"), n = 2000)
+PUhlhaas <- get_timelines(c("PUhlhaas"), n = 2000)
+dalejbarr <- get_timelines(c("dalejbarr"), n = 2000)
+JamesEBartlett <- get_timelines(c("JamesEBartlett"), n = 2000)
+realdaubman <- get_timelines(c("realdaubman"), n = 2000)
+EugeneDawydiak <- get_timelines(c("EugeneDawydiak"), n = 2000)
+
+female_psy_tw <- rbind(emilynordmann, Limor_Raviv, KateReidGlasgow, a_e_robertson, CSampaioBaptist, hollyscott248, william_the_sir, maxine_swingler, MarWimber, k_ainsworth_, StephanyBiello, clelandwoods, brain_on_dance, LisaDeBruine, Zayba_G, aussieweegie, rachaelejack, pimpmymemory)
+
+(aranceta, inaahon, A_Kostrytsia, AulaAmmar1, cmerrickbio, ciara_mcgrathx, Kate_McAulay, KimiaWitte, martavig5, bandiera_lucia, CamillaEnergy, RosalindHeron, XiKing2, DrZQiu)
+
+
+```
+
+```{r}
+text <- as.character(DrZQiu$text)
+sample <- sample(text, length(text))
+corpus <- Corpus(VectorSource(list(sample)))
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus,content_transformer(tolower))
+corpus <- tm_map(corpus,removeNumbers)
+corpus <- tm_map(corpus, stripWhitespace)
+corpus <- tm_map(corpus,removeWords, stopwords("english"))
+dtm_up <- DocumentTermMatrix(VCorpus(VectorSource(corpus[[1]]$content)))
+
+##frequencies and sentiment analysis
+freq_up = colSums(as.matrix(dtm_up))
+
+require(RSentiment)
+
+sentiments_up91 <- calculate_sentiment(names(freq_up))
+sentiments_up91 <- cbind(sentiments_up91, as.data.frame(freq_up))
+
+
+```
+
+```{r}
+## collect the frequencies of agentic and communal words
+freq_e_m_a6 <- sentiments_up6 %>% filter(text %in% c("achievement", "active", "ambitious", "analytical", "bold", "competent", "competitive", "consistent", "responsibility", "direct", "dominant", "effective", "firm", "independent", "intelligent", "leadership", "logical", "objective", "organized", "persistent", "productive", "reliable", "steady", "strong"))
+
+sum(freq_e_m_a6$freq_up)
+
+freq_e_m_c6 <- sentiments_up6 %>% filter(text %in% c("aware", "cheerful", "collaborative", "communicative", "compassionate", "emotional", "generous", "gentle", "helpful", "value", "intuitive", "kind", "modest", "neat", "people", "relationship", "sensitive", "sentimental", "sincere", "sociable", "sympathetic", "tender", "understanding", "warm" ))
+sum(freq_e_m_c6$freq_up)
+```
+
+For Loop for frequency analysis
+```{r}
+# For loop to store all the dataframe names
+typeof(sentiments_up6)
+
+filebase = ""
+for(val in 1:91){
+  filename <- "sentiments_up"
+  filename <- paste(filename, as.String(val), sep = "")
+  print(filename)
+  filebase <- c(filebase, filename)
+}
+typeof(filebase)
+as.list(filebase)
+typeof(filebase)
+filebase <- filebase[-1]
+print(filebase)
+##female engineer tweets
+x <- c("sentiments_up1", "sentiments_up2", "sentiments_up3", "sentiments_up4")
+print(x)
+for(val in filebase){
+  this = get(val)
+  ## collect the frequencies of agentic and communal words
+ freq_e_m_a6 <- this %>% filter(text %in% c("achievement", "active", "ambitious", "analytical", "bold", "competent", "competitive", "consistent", "responsibility", "direct", "dominant", "effective", "firm", "independent", "intelligent", "leadership", "logical", "objective", "organized", "persistent", "productive", "reliable", "steady", "strong"))
+  print(c("this is the agentic sum frequency of ", val))
+ print(sum(freq_e_m_a6$freq_up))
+
+ freq_e_m_c6 <- this %>% filter(text %in% c("aware", "cheerful", "collaborative", "communicative", "compassionate", "emotional", "generous", "gentle", "helpful", "value", "intuitive", "kind", "modest", "neat", "people", "relationship", "sensitive", "sentimental", "sincere", "sociable", "sympathetic", "tender", "understanding", "warm" ))
+   print(c("this is the communal sum frequency of ", val))
+ print(sum(freq_e_m_c6$freq_up))
+}
+
+```
+
+T-test
+```{r}
+#1. Read the data file
+wordlist_data <- file.choose("word_list_data")
+wordlist_data <- read.csv(wordlist_data)
+library(dplyr)
+dat_means_school <- filter(wordlist_data, 
+                 school%in% c("engineering",
+                             "psychology"))
+dat_means_school <- dat_means_school %>%
+  mutate(school = as.factor(school))
+
+group_by(dat_means_school, school) %>%
+  summarise(mean = mean(agentic, na.rm = TRUE),
+    sd = sd(agentic, na.rm = TRUE),
+    median = median(agentic, na.rm = TRUE))
+
+dat_means_school %>%
+ggplot(aes(x = school, y = communal)) +
+  geom_violin(trim = FALSE) +
+  geom_boxplot(aes(fill = school), width = .2, show.legend = FALSE) + 
+  stat_summary(geom = "pointrange", fun.data = "mean_cl_normal")  +
+  labs(x = "Group", y = "Communal Words") +
+  geom_jitter()
+
+#check variances
+#p value more than 0.05 means that the variances of two samples are not significant
+eng_variance_a = subset(as.data.frame(dat_means_school), school=='engineering')[,'agentic']
+psy_variance_a = subset(as.data.frame(dat_means_school), school=='psychology')[,'agentic']
+var.test(eng_variance_a,psy_variance_a, ratio = 1, alternative = c("two.sided"))
+
+eng_help <- filter(dat_means_school, 
+                 school %in% c("engineering"))
+psy_help <- filter(dat_means_school, 
+                 school %in% c("psychology"))
+shapiro.test(x = eng_help$agentic)
+shapiro.test(x = psy_help$agentic)
+shapiro.test(x = eng_help$communal)
+shapiro.test(x = psy_help$communal)
+```
+
+
